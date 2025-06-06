@@ -10,17 +10,11 @@ pids
 *.seed
 *.pid.lock
 
-# Coverage directory used by tools like istanbul
-coverage/
-
-# Dependency directories
+# Dependencies
 node_modules/
 
 # Optional npm cache directory
 .npm
-
-# Optional REPL history
-.node_repl_history
 
 # Output of 'npm pack'
 *.tgz
@@ -48,10 +42,10 @@ Thumbs.db
 # Vercel
 .vercel
 
-# Mission logs (user-generated)
-assets/mission-logs/*.log
-assets/mission-logs/*.txt
-
 # Backup files
 *.bak
 *.backup
+
+# Deployment scripts (keep in repo)
+!deploy_to_github.sh
+!README.md
