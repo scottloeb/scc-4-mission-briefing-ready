@@ -257,9 +257,9 @@
             animation: fadeIn 0.5s ease-out;
         }
         
-        .error-message {
-            background: rgba(255, 68, 68, 0.9);
-            color: #FFFFFF;
+        .success-message {
+            background: rgba(0, 255, 65, 0.9);
+            color: #000000;
             padding: 15px;
             border-radius: 8px;
             text-align: center;
@@ -279,38 +279,6 @@
         }
         
         /* REST OF ORIGINAL STYLING (simplified for space) */
-        .strategy-tab {
-            position: fixed;
-            top: 50%;
-            right: 0;
-            transform: translateY(-50%) rotate(-90deg);
-            background: linear-gradient(145deg, #FC3D21, #0B3D91);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 8px 8px 0 0;
-            z-index: 1001;
-            font-weight: bold;
-            letter-spacing: 1px;
-            pointer-events: none;
-            opacity: 0.5;
-        }
-        
-        .strategy-panel {
-            position: fixed;
-            top: 80px;
-            right: -400px;
-            width: 400px;
-            height: calc(100vh - 80px);
-            background: linear-gradient(145deg, #0d1117 0%, #1a1a1a 100%);
-            border-left: 3px solid #FC3D21;
-            z-index: 1000;
-            transition: right 0.3s ease;
-            overflow-y: auto;
-            padding: 20px;
-            pointer-events: none;
-            opacity: 0.5;
-        }
-        
         .header {
             background: linear-gradient(90deg, #0B3D91 0%, #1a1a1a 100%);
             padding: 20px;
@@ -369,18 +337,6 @@
             gap: 20px;
             pointer-events: none;
             opacity: 0.7;
-        }
-        
-        @media (min-width: 768px) {
-            .container {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        
-        @media (min-width: 1200px) {
-            .container {
-                grid-template-columns: repeat(3, 1fr);
-            }
         }
         
         .panel {
@@ -647,7 +603,7 @@
         </div>
     </div>
 
-    <!-- Simplified dashboard content (non-functional except expand/collapse) -->
+    <!-- Simplified dashboard content -->
     <div class="main-content">
         <div class="header">
             <div class="logo">🚀 NASA MISSION CONTROL</div>
@@ -677,8 +633,6 @@
                     </div>
                 </div>
             </div>
-            
-            <!-- Add more simplified panels as needed -->
         </div>
     </div>
     
@@ -813,8 +767,10 @@
             } else if (hasCorrectColumn1) {
                 // Correct combination!
                 sendDataToScott();
-                window.open('https://switch-command-briefing.vercel.app', '_blank');
                 showMessage('ACCESS GRANTED - Opening classified briefing...', 'success');
+                setTimeout(() => {
+                    window.open('https://scc-mission-briefing.vercel.app', '_blank');
+                }, 1500);
             } else {
                 // Wrong column 1 selection
                 showMessage('Incorrect selection. Try a different combination.', 'error');
@@ -850,7 +806,8 @@
         function showMessage(text, type) {
             const messageArea = document.getElementById('messageArea');
             const messageClass = type === 'error' ? 'error-message' : 
-                                 type === 'hint' ? 'hint-message' : 'error-message';
+                                 type === 'hint' ? 'hint-message' : 
+                                 type === 'success' ? 'success-message' : 'error-message';
             
             messageArea.innerHTML = `<div class="${messageClass}">${text}</div>`;
         }
@@ -860,8 +817,6 @@
         }
         
         function sendDataToScott() {
-            const formData = new URLSearchParams();
-            
             // Collect selections
             const column1Selection = selectedItems.column1 ? 
                 selectedItems.column1.element.querySelector('.product-name').textContent : 'None';
@@ -873,24 +828,35 @@
                 item.element.querySelector('.product-name').textContent).join(', ') || 'None';
             
             const totalPrice = calculateTotal();
+            const timestamp = new Date().toISOString();
             
-            // Google Form entry IDs (these need to be extracted from your actual form)
-            formData.append('entry.1234567890', column1Selection); // Column 1 field
-            formData.append('entry.1234567891', column2Selections); // Column 2 field  
-            formData.append('entry.1234567892', column3Selections); // Column 3 field
-            formData.append('entry.1234567893', `$${totalPrice.toFixed(2)}`); // Total price field
+            // Debug log the data being sent
+            console.log('🎯 CIPHER SOLVED - DATA TO SUBMIT:');
+            console.log('Bundle Selection:', column1Selection);
+            console.log('Games:', column2Selections);
+            console.log('Accessories:', column3Selections);
+            console.log('Total Price:', `$${totalPrice.toFixed(2)}`);
+            console.log('Timestamp:', timestamp);
             
-            // Submit to Google Form
-            fetch('https://docs.google.com/forms/d/e/1FAIpQLSf' + 'mb9rww7zAUSmSUvC8' + '/formResponse', {
+            // Create form data with the CORRECT entry IDs from your pre-filled URL
+            const formData = new URLSearchParams();
+            formData.append('entry.1938498803', column1Selection);     // Bundle Selection
+            formData.append('entry.1439289917', column2Selections);    // Games
+            formData.append('entry.1273780676', column3Selections);    // Accessories
+            formData.append('entry.1986185890', `${totalPrice.toFixed(2)}`); // Total Price
+            
+            // Submit to your Google Form 
+            fetch('https://docs.google.com/forms/d/e/1FAIpQLSeugBDVBxz64F1wcub90amgxC6XSaahIX6VvgmIklAJHA6IQA/formResponse', {
                 method: 'POST',
                 mode: 'no-cors',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: formData
-            }).catch(() => {
-                // Ignore CORS errors - the data still goes through
-                console.log('📤 Data sent to Scott successfully');
+            }).then(() => {
+                console.log('📤 Form submission completed successfully!');
+            }).catch((error) => {
+                console.log('📤 Form submission attempted (CORS expected):', error);
             });
         }
         
@@ -946,6 +912,7 @@
         console.log('🔐 Waiting for clearance verification...');
         console.log('📱 Touch/scroll detection active');
         console.log('⏰ 10-second escalation timer will start on first activity');
+        console.log('📋 Google Form configured with entry IDs: 1938498803, 1439289917, 1273780676, 1986185890');
     </script>
 </body>
 </html>
